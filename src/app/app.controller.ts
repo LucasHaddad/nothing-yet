@@ -1,19 +1,26 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
+import { JwtAuthGuard } from '@/auth/auth.guard';
 
 @Controller()
 @ApiTags('App')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  index() {
+      return 'Protected';
+  }
+
   @Get('HealthCheck')
-  getHello(): string {
+  healthCheck(): string {
     return this.appService.getHello();
   }
 
   @Get('Exception')
-  getException() {
+  exception() {
     this.appService.getException();
   }
 }

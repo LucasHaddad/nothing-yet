@@ -3,11 +3,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from '@/app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { config } from 'dotenv';
+import { logger } from './logger.provider';
+import passport from 'passport';
 
 config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { logger: false });
 
   const config = new DocumentBuilder()
     .setTitle('Auth')
@@ -16,6 +18,10 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);
+
+  app.useLogger(logger);
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   app.useGlobalPipes(
     new ValidationPipe({
